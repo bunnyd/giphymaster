@@ -1,33 +1,38 @@
+import "babel-regenerator-runtime";
 import React from "react";
 import ReactDOM from "react-dom";
 import { Provider } from "react-redux";
 import { createStore, applyMiddleware } from "redux";
 import reducer from "./reducers";
+import { Router, Route } from "react-router";
+import { ConnectedRouter, routerMiddleware } from "react-router-redux";
+import createBrowserHistory from "history/createBrowserHistory";
 
-import App from "./components/app";
 import { createLogger } from "redux-logger";
 import { searchSuccess } from "./actions/search";
+import App from "./components/app/app.container";
 
-const store = createStore(reducer, applyMiddleware(createLogger()));
+import searchSaga from "./sagas/search";
+import createSagaMiddleware from "redux-saga";
+import SearchPage from "./components/pages/search/search";
 
-const results = [
-  {
-    full: "https://media3.giphy.com/media/g5KhmX06Q0XBu/giphy.gif",
-    thumbnail: "https://media3.giphy.com/media/g5KhmX06Q0XBu/100_s.gif"
-  },
-  {
-    full: "https://media2.giphy.com/media/uw3fTCTNMbXAk/giphy.gif",
-    thumbnail: "https://media2.giphy.com/media/uw3fTCTNMbXAk/100_s.gif"
-  }
-];
+const sagas = createSagaMiddleware();
+const history = createBrowserHistory();
 
-window.setTimeout(() => {
-  store.dispatch(searchSuccess(results));
-}, 2000);
+const store = createStore(
+  reducer,
+  applyMiddleware(routerMiddleware(history), createLogger(), sagas)
+);
+
+sagas.run(searchSaga);
 
 ReactDOM.render(
   <Provider store={store}>
-    <App />
+    <ConnectedRouter history={history}>
+      <App>
+        <Route exact path="/" component={SearchPage} />
+      </App>
+    </ConnectedRouter>
   </Provider>,
   document.getElementById("app")
 );

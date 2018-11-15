@@ -4,17 +4,17 @@ import ReactDOM from "react-dom";
 import { Provider } from "react-redux";
 import { createStore, applyMiddleware } from "redux";
 import reducer from "./reducers";
+import { searchSuccess } from "./actions/search";
+import App from "./components/app/app.container";
+import { createLogger } from "redux-logger";
+import searchSaga from "./sagas/search";
+import createSagaMiddleware from "redux-saga";
 import { Router, Route } from "react-router";
 import { ConnectedRouter, routerMiddleware } from "react-router-redux";
 import createBrowserHistory from "history/createBrowserHistory";
-
-import { createLogger } from "redux-logger";
-import { searchSuccess } from "./actions/search";
-import App from "./components/app/app.container";
-
-import searchSaga from "./sagas/search";
-import createSagaMiddleware from "redux-saga";
 import SearchPage from "./components/pages/search/search";
+import TrendingPage from "./components/pages/trending/trending";
+import RandomPage from "./components/pages/random/random";
 
 const sagas = createSagaMiddleware();
 const history = createBrowserHistory();
@@ -31,6 +31,8 @@ ReactDOM.render(
     <ConnectedRouter history={history}>
       <App>
         <Route exact path="/" component={SearchPage} />
+        <Route path="/trending" component={TrendingPage} />
+        <Route path="/random" component={RandomPage} />
       </App>
     </ConnectedRouter>
   </Provider>,
